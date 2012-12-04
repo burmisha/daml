@@ -18,50 +18,48 @@ axis normal; hold on;
 [~, idx] = max(X(:,1)==max(X(:,1)));
 plot(X(idx,1), X(idx,2), 'b.','LineWidth',3);
 
-[BestAngle, BestIdx] = AngleIdxInit();
+[BestAngle, BestPos] = AngleIdxInit();
 for i=1:size(X,1)
     Dist = norm(X(i,:) - X(idx,:));
     if (Dist < r) && (i ~= idx)
         Angle = clangle([0 -1 (X(i,:)-X(idx,:))]);
         if (Angle > MinAngle) && (BestAngle > Angle)
-            BestIdx = i;
+            BestPos = i;
             BestAngle = Angle;
         end
     end
+    
 end
-plot(X(BestIdx,1), X(BestIdx,2), 'b.','LineWidth',3);
-idx = [idx BestIdx];
+
+
+
+plot(X(BestPos,1), X(BestPos,2), 'b.','LineWidth',3);
+idx = [idx BestPos];
 
 while idx(end) ~= idx(1)
     Previous = X(idx(end),:);
     PrePrevious = X(idx(end-1),:);
     LastLine = Previous - PrePrevious;
-    [BestAngle, BestIdx] = AngleIdxInit();
-    [TestAngle, TestIdx] = AngleIdxInit();
     nearest = find(((X(:,1) - Previous(1)).^2 + (X(:,2) - Previous(2)).^2) < r^2);
     nearest(nearest == idx(end)) = [];
     XX = X(nearest,:);
     NPrev = (XX(:,1) - Previous(1)).^2 + (XX(:,2) - Previous(2)).^2;
     NPPrev = (XX(:,1) - PrePrevious(1)).^2 + (XX(:,2) - PrePrevious(2)).^2;
     Angle = clangle([ones(length(nearest),1) * LastLine (XX-ones(length(nearest),1)*Previous) ] );
-    for i=find(Angle > MinAngle)'
-        if NPrev(i) <= NPPrev(i)
-            if (BestAngle > Angle(i))
-                BestIdx = nearest(i);
-                BestAngle = Angle(i);
-            end
-        else
-            if (TestAngle > Angle(i))
-                TestIdx = nearest(i);
-                TestAngle = Angle(i);
-            end
-        end
+    Positive = find((Angle > MinAngle) & (NPrev <= NPPrev));
+    Negative = find((Angle > MinAngle) & (NPrev > NPPrev));
+    [~, BestPos] = min(Angle(Positive));
+    [~, BestNeg] = min(Angle(Negative));
+    if ~isempty((Angle(Positive)))
+        NewIdx = nearest(Positive(BestPos));
+    else
+        [~, BestNeg] = min(Angle(Negative));
+        NewIdx = nearest(Negative(BestNeg));
     end
-    if (BestIdx == 0)
-        BestIdx = TestIdx;
-    end
-    idx = [idx BestIdx];
-    %plot(X(BestIdx,1), X(BestIdx,2), 'g.','LineWidth',3);
+    %plot(XX(Positive,1), XX(Positive,2), 'y.','LineWidth',3);
+    idx = [idx NewIdx];
+    %plot(XX(Positive,1), XX(Positive,2), 'r.','LineWidth',3);
+    %plot(X(NewIdx,1), X(NewIdx,2), 'g.','LineWidth',3);
     %length(idx)
 end
 
