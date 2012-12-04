@@ -1,14 +1,26 @@
-clear all;
+%clear all;
 
-FileNumber = 5;
-FileNamePrefix = sprintf('%d',FileNumber);
-RadiusOptimal = [500, 12, 13, 13, 14];
-X = dlmread(strcat(FileNamePrefix,'.txt'));
-r = RadiusOptimal(FileNumber);
+%FileNumber = 5;
+%FileNamePrefix = sprintf('%d',FileNumber);
+%RadiusOptimal = [500, 12, 13, 13, 14];
+%X = dlmread(strcat(FileNamePrefix,'.txt'));
+%r = RadiusOptimal(FileNumber);
+
+%%
+clear all 
+X = dlmread('data/fish (48).txt', ' ', 1, 0);
+r = 20
+X=X(:,[1 3]);
+
+    X(:,1) = (X(:,1) - min( X(:,1))) / (max(X(:,1)) - min( X(:,1))) * 100;
+    X(:,2) = (X(:,2) - min( X(:,2))) / (max(X(:,2)) - min( X(:,2))) * 100;
+%%
+
+%r = 19;
 MinAngle = -179;
 
 AngleIdxInit = @() ndgrid(1000, 0);
-clangle = @(x) (1.25-4*(heaviside(x(:,1).*x(:,4)-x(:,2).*x(:,3))-0.75).^2) .*acos((x(:,1).*x(:,3)+x(:,2).*x(:,4))./sqrt((x(:,1).^2+ x(:,2).^2) .*(x(:,3).^2+ x(:,4).^2)))*180/pi;
+clangle = @(x) ((x(:,1).*x(:,4)-x(:,2).*x(:,3) >= 0 ) * 2 -1 ) .*abs(acos((x(:,1).*x(:,3)+x(:,2).*x(:,4))./sqrt((x(:,1).^2+ x(:,2).^2) .*(x(:,3).^2+ x(:,4).^2))))*180/pi;
 
 h = plot(X(:,1), X(:,2), 'r.','LineWidth',1);
 axis normal; hold on;
@@ -40,14 +52,23 @@ while idx(end) ~= idx(1)
     Angle = clangle([ones(length(nearest),1) * LastLine (XX-ones(length(nearest),1)*Previous) ] );
     Positive = find((Angle > MinAngle) & (NPrev <= NPPrev));
     if ~isempty(Angle(Positive))
-        [~, BestPos] = min(Angle(Positive));
+        [min_angle, BestPos] = min(Angle(Positive));
+        if min_angle == 0
+            idx = idx(1:end-1)
+        end
+         
         NewIdx = nearest(Positive(BestPos));
     else
+        error ='Not found'
         Negative = find((Angle > MinAngle) & (NPrev > NPPrev));
         [~, BestNeg] = min(Angle(Negative));
         NewIdx = nearest(Negative(BestNeg));
     end
+    plot(XX(Positive,1), XX(Positive,2), 'y.','LineWidth',3);
     idx = [idx NewIdx];
+    plot(X(idx(end),1), X(idx(end),2), 'g.','LineWidth',4);
+    plot(XX(Positive,1), XX(Positive,2), 'r.','LineWidth',3);
+    plot(X(idx,1), X(idx,2), 'b.','LineWidth',2);
 end
 
 Perimeter = sum(sqrt((X(idx(1:end-1),1)-X(idx(2:end),1)).^2 + (X(idx(1:end-1),2)-X(idx(2:end),2)).^2) )
