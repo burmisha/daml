@@ -1,4 +1,4 @@
-function [ Per, Area,Id,ConvPer,ConvArea,ConvId ] = collect( fileidx, filename_prefix )
+function [AllFeatures, Per, Area,Id,ConvPer,ConvArea,ConvId ] = collect( fileidx, filename_prefix )
 %COLLECT Summary of this function goes here
 %   Detailed explanation goes here
     R = 10; % 15 - good, 10 - too
@@ -22,5 +22,6 @@ function [ Per, Area,Id,ConvPer,ConvArea,ConvId ] = collect( fileidx, filename_p
         % imshow(binarise_cloud(X, R_bin)');
         number
     end
+    AllFeatures = [Per, Area,Id,ConvPer,ConvArea, ConvId];
 end
 
