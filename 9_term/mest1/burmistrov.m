@@ -1,6 +1,6 @@
 clear all;
 
-X = dlmread('5.txt', ' ', 0, 0);
+X = dlmread('4.txt', ' ', 0, 0);
 X=[X(:,1), X(:,3)];
 % 2 -> 16, -150
 % 3 -> 27, -150; 13, -178
@@ -8,13 +8,18 @@ X=[X(:,1), X(:,3)];
 % 5 -> 19, -178;
 r = 19;
 MinAngle = -178;
-AngleIdxInit=@() ndgrid(1000, 0);
-ImprooveAngleIdx=@(BA, BI, A, I) ndgrid(min(A, BA), [I BI] * ([A; BA] == min(A, BA)) );
+
+AngleIdxInit = @() ndgrid(1000, 0);
+ImprooveAngleIdx = @(BA, BI, A, I) ndgrid(min(A, BA), [I BI] * ([A; BA] == min(A, BA)) );
+clangle = @(u,v) (1.25-4*(heaviside((u(1)*v(2)-u(2)*v(1)))-0.75)^2)* acos(dot(u,v)/(norm(u)*norm(v)))*180/pi;
+
+%18*(find([17; 16] == min(17, 16), 1 , 'first'))
+[I BI] * ([A; BA] == min(A, BA))
+[b e ] = ImprooveAngleIdx(7, 10, 7, 5);
+[b e]
 plot(X(:,1), X(:,2), 'r.','LineWidth',1);
 axis normal; hold on;
-%ImprooveAngleIdx(17, 10, 53, 17)
-%[a, b] = ndgrid(min(17, 53), [10; 17] * ([17, 53] == min(17, 53)) );
-% ndgrid([10 17] * find([17; 17] == min(17, 53)) )
+
 [~, idx] = max(X(:,1)==max(X(:,1)));
 plot(X(idx,1), X(idx,2), 'b.','LineWidth',3);
 
@@ -24,10 +29,6 @@ for i=1:size(X,1)
     if (Dist < r) && (i ~= idx)
         Angle = clangle([0 -1], X(i,:)- X(idx,:));
         [BestAngle, BestIdx] = ImprooveAngleIdx(BestAngle, BestIdx, Angle, i);
-        %if (Angle > MinAngle) && (BestAngle > Angle)
-        %    BestIdx = i;
-        %    BestAngle = Angle;
-        %end
     end
 end
 plot(X(BestIdx,1), X(BestIdx,2), 'b.','LineWidth',3);
@@ -45,24 +46,24 @@ while idx(end) ~= idx(1)
         Angle = clangle(LastLine, X(i,:)- Previous);
         if (Angle > MinAngle)
             NPrev = norm(X(i,:) - Previous);
-            if (BestAngle > Angle) && (NPrev <= norm(X(i,:) - PrePrevious))
+            NPPrev = norm(X(i,:) - PrePrevious);
+            if (BestAngle > Angle) && (NPrev <= NPPrev)
                 BestIdx = i;
                 BestAngle = Angle;
             end
-            if (TestAngle > Angle) && (NPrev > norm(X(i,:) - PrePrevious))
+            if (TestAngle > Angle) && (NPrev >  NPPrev)
                 TestIdx = i;
                 TestAngle = Angle;
             end
         end
-        %end
     end
     if (BestIdx == 0)
         BestIdx = TestIdx;
     end
     idx = [idx BestIdx];
-    %plot(X(BestIdx,1), X(BestIdx,2), 'g.','LineWidth',3);
-    %length(idx)
+    plot(X(BestIdx,1), X(BestIdx,2), 'g.','LineWidth',3);
+    length(idx)
 end
 
-plot(X(idx,1), X(idx,2), 'g-','LineWidth',1);
+plot(X(idx,1), X(idx,2), 'g-','LineWidth',2);
 hold off
