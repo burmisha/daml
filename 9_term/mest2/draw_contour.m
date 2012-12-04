@@ -10,10 +10,11 @@
 
 % bugs:
 % bird 4 -> 20
-% 
+% fish 38 -> 15
 clear all 
-X = dlmread('data/fish (38).txt', ' ', 1, 0);
-r = 15
+%X = dlmread('data/fish (38).txt', ' ', 1, 0);
+X = dlmread('data/bird (4).txt', ' ', 1, 0);
+r = 10
 X=X(:,[1 3]);
 
     X(:,1) = (X(:,1) - min( X(:,1))) / (max(X(:,1)) - min( X(:,1))) * 100;

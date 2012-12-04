@@ -27,7 +27,7 @@ for number=fish_fileidx
     %axis ij;
     number
 end
-w-w
+
 for number=bird_fileidx
     prefix = bird_prefix;
     file_name = strcat(folder_name, '/', prefix, num2str(number), suffix);

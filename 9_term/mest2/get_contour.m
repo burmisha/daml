@@ -36,18 +36,18 @@ while idx(end) ~= idx(1)
         end
         NewIdx = nearest(Positive(BestPos));
     else
-        error ='negative';
         PPPrevious = X(idx(end-2),:);
         NPPPrev = (XX(:,1) - PPPrevious(1)).^2 + (XX(:,2) - PPPrevious(2)).^2;
-        N_1 = find((Angle > MinAngle) & (NPrev > NPPrev) & (NPrev < NPPPrev));
-        if ~isempty(N_1)
-            [~, BestNeg] = min(Angle(N_1));
-            NewIdx = nearest(N_1(BestNeg));
+        Level_1 = find((Angle > 0) & (NPrev > NPPrev) & (NPrev < NPPPrev));
+        if ~isempty(Level_1)
+            error_level ='ERROR LEVEL: 1';
+            [~, BestNeg] = min(Angle(Level_1));
+            NewIdx = nearest(Level_1(BestNeg));
         else
-            error ='ost';
-            Ost = find((Angle > MinAngle) & ((NPPrev <= NPPrev) | (NPrev < NPPPrev)));
-            [~, BestOst] = min(Angle(Ost));
-            NewIdx = nearest(Ost(BestOst));
+            error_level ='ERROR LEVEL: 2';
+            Level_2 = find((Angle > MinAngle) & (NPrev > NPPrev) & (NPrev >= NPPPrev));
+            [~, BestOst] = min(Angle(Level_2));
+            NewIdx = nearest(Level_2(BestOst));
         end
     end
     %plot(XX(Positive,1), XX(Positive,2), 'y.','LineWidth',3);
