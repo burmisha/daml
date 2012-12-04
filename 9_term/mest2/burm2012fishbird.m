@@ -1,10 +1,14 @@
 clear all;
 folder_name = 'data';
-fish_prefix = '?';
-bird_prefix = '?'
+fish_prefix = 'fish (';
+bird_prefix = 'bird (';
+suffix = ').txt';
 fish_fileidx = 1:52;
-bird_fileidx = [1:47 49:56];
-% ????: 
-number = 5
-strcat(fish_prefix)
-file_name = strcat(folder_name, '//', fish_prefix, '_', num2str(number), 'txt')
+bird_fileidx = 1:55;
+number = 40;
+prefix = bird_prefix;
+file_name = strcat(folder_name, '/', prefix, num2str(number), suffix);
+X = dlmread(file_name, ' ', 1, 0);
+X = X(:,[1 3]);
+h = plot(X(:,1), X(:,2), 'r.','LineWidth',1);
+axis ij;
