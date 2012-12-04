@@ -15,7 +15,9 @@ XX = X(nearest,:);
 Angle = clangle([ones(length(nearest),1) * [0 -1] (XX - ones(length(nearest),1) * Previous)]);
 [~, NewIdx] = min(Angle(Angle > MinAngle));
 idx = [idx nearest(NewIdx)];
-
+%plot(X(:,1), X(:,2), 'r.','LineWidth',2);
+%plot(X(idx,1), X(idx,2), 'b.','LineWidth',2);
+%hold on
 while idx(end) ~= idx(1)
     Previous = X(idx(end),:);
     PrePrevious = X(idx(end-1),:);
@@ -27,18 +29,32 @@ while idx(end) ~= idx(1)
     NPPrev = (XX(:,1) - PrePrevious(1)).^2 + (XX(:,2) - PrePrevious(2)).^2;
     Angle = clangle([ones(length(nearest),1) * LastLine (XX-ones(length(nearest),1)*Previous) ] );
     Positive = find((Angle > MinAngle) & (NPrev <= NPPrev));
-    if ~isempty(Angle(Positive))
+    if ~isempty(Positive)
         [min_angle, BestPos] = min(Angle(Positive));
         if min_angle == 0
             idx = idx(1:end-1);
         end
         NewIdx = nearest(Positive(BestPos));
     else
-        Negative = find((Angle > MinAngle) & (NPrev > NPPrev));
-        [~, BestNeg] = min(Angle(Negative));
-        NewIdx = nearest(Negative(BestNeg));
+        error ='negative';
+        PPPrevious = X(idx(end-2),:);
+        NPPPrev = (XX(:,1) - PPPrevious(1)).^2 + (XX(:,2) - PPPrevious(2)).^2;
+        N_1 = find((Angle > MinAngle) & (NPrev > NPPrev) & (NPrev < NPPPrev));
+        if ~isempty(N_1)
+            [~, BestNeg] = min(Angle(N_1));
+            NewIdx = nearest(N_1(BestNeg));
+        else
+            error ='ost';
+            Ost = find((Angle > MinAngle) & ((NPPrev <= NPPrev) | (NPrev < NPPPrev)));
+            [~, BestOst] = min(Angle(Ost));
+            NewIdx = nearest(Ost(BestOst));
+        end
     end
+    %plot(XX(Positive,1), XX(Positive,2), 'y.','LineWidth',3);
     idx = [idx NewIdx];
+    %plot(X(idx(end),1), X(idx(end),2), 'g.','LineWidth',4);
+    %plot(XX(Positive,1), XX(Positive,2), 'r.','LineWidth',3);
+    %plot(X(idx,1), X(idx,2), 'b.','LineWidth',2);
 end
 
 Perimeter = sum(sqrt((X(idx(1:end-1),1)-X(idx(2:end),1)).^2 + (X(idx(1:end-1),2)-X(idx(2:end),2)).^2) );

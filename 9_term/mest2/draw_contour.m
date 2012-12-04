@@ -7,9 +7,13 @@
 %r = RadiusOptimal(FileNumber);
 
 %%
+
+% bugs:
+% bird 4 -> 20
+% 
 clear all 
-X = dlmread('data/fish (48).txt', ' ', 1, 0);
-r = 20
+X = dlmread('data/fish (38).txt', ' ', 1, 0);
+r = 15
 X=X(:,[1 3]);
 
     X(:,1) = (X(:,1) - min( X(:,1))) / (max(X(:,1)) - min( X(:,1))) * 100;
@@ -51,18 +55,26 @@ while idx(end) ~= idx(1)
     NPPrev = (XX(:,1) - PrePrevious(1)).^2 + (XX(:,2) - PrePrevious(2)).^2;
     Angle = clangle([ones(length(nearest),1) * LastLine (XX-ones(length(nearest),1)*Previous) ] );
     Positive = find((Angle > MinAngle) & (NPrev <= NPPrev));
-    if ~isempty(Angle(Positive))
+    if ~isempty(Positive)
         [min_angle, BestPos] = min(Angle(Positive));
         if min_angle == 0
-            idx = idx(1:end-1)
+            idx = idx(1:end-1);
         end
-         
         NewIdx = nearest(Positive(BestPos));
     else
-        error ='Not found'
-        Negative = find((Angle > MinAngle) & (NPrev > NPPrev));
-        [~, BestNeg] = min(Angle(Negative));
-        NewIdx = nearest(Negative(BestNeg));
+        PPPrevious = X(idx(end-2),:);
+        NPPPrev = (XX(:,1) - PPPrevious(1)).^2 + (XX(:,2) - PPPrevious(2)).^2;
+        Level_1 = find((Angle > 0) & (NPrev > NPPrev) & (NPrev < NPPPrev));
+        if ~isempty(Level_1)
+            error_level ='ERROR LEVEL: 1'
+            [~, BestNeg] = min(Angle(Level_1));
+            NewIdx = nearest(Level_1(BestNeg));
+        else
+            error_level ='ERROR LEVEL: 2'
+            Level_2 = find((Angle > MinAngle) & (NPrev > NPPrev) & (NPrev >= NPPPrev));
+            [~, BestOst] = min(Angle(Level_2));
+            NewIdx = nearest(Level_2(BestOst));
+        end
     end
     plot(XX(Positive,1), XX(Positive,2), 'y.','LineWidth',3);
     idx = [idx NewIdx];
@@ -71,14 +83,10 @@ while idx(end) ~= idx(1)
     plot(X(idx,1), X(idx,2), 'b.','LineWidth',2);
 end
 
-Perimeter = sum(sqrt((X(idx(1:end-1),1)-X(idx(2:end),1)).^2 + (X(idx(1:end-1),2)-X(idx(2:end),2)).^2) )
-Area = 1/2 * sum(X(idx(1:end-1),1).*X(idx(2:end),2) - X(idx(1:end-1),2).*X(idx(2:end),1))
-
 plot(X(idx,1), X(idx,2), 'g-','LineWidth',2);
-axis('square');
-axis('xy');
-text(   0.5*min(X(:,1)) + 0.5* max(X(:,1)), min(X(:,2)), ...
-    strcat('$$r=',num2str(r),', P = ', num2str(Perimeter),', S = ',num2str(Area),'$$'), ...
-    'Interpreter','latex', 'FontSize',12);
-%saveas(h, strcat(FileNamePrefix, sprintf('_r%d.eps',r)),        'eps2c');
+
+%iii= get_contour(X, r);
+idx
+%iii
+
 hold off

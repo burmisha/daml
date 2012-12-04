@@ -24,10 +24,10 @@ for number=fish_fileidx
     plot(X(idx,1), X(idx,2), 'g-','LineWidth',1);
     hold on
     plot(X(idx,1), X(idx,2), 'b.','LineWidth',2);
-    axis ij;
+    %axis ij;
     number
 end
-
+w-w
 for number=bird_fileidx
     prefix = bird_prefix;
     file_name = strcat(folder_name, '/', prefix, num2str(number), suffix);
