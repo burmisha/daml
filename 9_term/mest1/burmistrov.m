@@ -1,9 +1,9 @@
 clear all;
 
-FileNumber = 2;
-RadiusOptimal = [500, 12, 13, 13, 19];
-X = dlmread(sprintf('%d.txt',FileNumber));
-%X = [X(:,1), X(:,3)];  % 2 -> 12 .. 10     % 3 -> 13 .. 12     % 4 -> 13 .. 11     % 5 -> 19 only
+FileNumber = 5;
+FileNamePrefix = sprintf('%d',FileNumber);
+RadiusOptimal = [500, 12, 13, 13, 14];
+X = dlmread(strcat(FileNamePrefix,'.txt'));
 r = RadiusOptimal(FileNumber);
 MinAngle = -179;
 
@@ -13,7 +13,9 @@ clangle = @(x) (1.25-4*(heaviside(x(:,1).*x(:,4)-x(:,2).*x(:,3))-0.75).^2) .*aco
 h = plot(X(:,1), X(:,2), 'r.','LineWidth',1);
 axis normal; hold on;
 
-[~, idx] = max(X(:,1)==max(X(:,1)));
+MaxedX=find(X(:,1)==max(X(:,1)));
+[~, idx] = max(X(MaxedX, 2));
+idx = MaxedX(idx);
 plot(X(idx,1), X(idx,2), 'b.','LineWidth',3);
 
 Previous = X(idx,:);
@@ -45,24 +47,17 @@ while idx(end) ~= idx(1)
         [~, BestNeg] = min(Angle(Negative));
         NewIdx = nearest(Negative(BestNeg));
     end
-    %plot(XX(Positive,1), XX(Positive,2), 'y.','LineWidth',3);
     idx = [idx NewIdx];
-    %plot(XX(Positive,1), XX(Positive,2), 'r.','LineWidth',3);
-    plot(X(idx(end),1), X(idx(end),2), 'g.','LineWidth',3);
-    %length(idx)
 end
 
 Perimeter = sum(sqrt((X(idx(1:end-1),1)-X(idx(2:end),1)).^2 + (X(idx(1:end-1),2)-X(idx(2:end),2)).^2) )
 Area = 1/2 * sum(X(idx(1:end-1),1).*X(idx(2:end),2) - X(idx(1:end-1),2).*X(idx(2:end),1))
 
 plot(X(idx,1), X(idx,2), 'g-','LineWidth',2);
-%axis('tight')
 axis('square');
 axis('xy');
 text(   0.5*min(X(:,1)) + 0.5* max(X(:,1)), min(X(:,2)), ...
-        strcat('$$P = ', num2str(Perimeter),', S = ',num2str(Area),'$$'), ...
-        'Interpreter','latex', 'FontSize',12);
-saveas(h, sprintf('%d_r%d.eps',FileNumber,r),        'eps2c');
+    strcat('$$r=',num2str(r),', P = ', num2str(Perimeter),', S = ',num2str(Area),'$$'), ...
+    'Interpreter','latex', 'FontSize',12);
+saveas(h, strcat(FileNamePrefix, sprintf('_r%d.eps',r)),        'eps2c');
 hold off
-
-
