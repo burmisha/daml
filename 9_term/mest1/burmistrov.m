@@ -1,16 +1,14 @@
 clear all;
-%close
-X = dlmread('input.txt', ' ', 1, 0);
-X=[X(:,1), X(:,2)]
-r = 1.2;
+%close all;
 %%
-X = dlmread('3.txt', ' ', 0, 0);
+X = dlmread('5.txt', ' ', 0, 0);
 X=[X(:,1), X(:,3)];
 % 2 -> 16, -150
-% 3 -> 27, -150
-% 4 -> 13, -150
-r = 13;
-MinAngle = -150;
+% 3 -> 27, -150; 13, -178
+% 4 -> 13, -150; 13, -178
+% 5 -> 19, -178;
+r = 19;
+MinAngle = -178;
 
 %%
 plot(X(:,1), X(:,2), 'r.','LineWidth',1); 
@@ -39,20 +37,17 @@ while idx(end) ~= first_idx
     PrePrevious = X(idx(end-1),:);
     LastLine = Previous - PrePrevious;
     BestAngle = 1000;
-    BestDist = 2*r;
     BestIdx = 0;
-    TestIdx = BestAngle;
+    TestIdx = BestIdx;
     TestAngle = BestAngle;
     for i=1:size(X,1)
         Dist = norm(X(i,:) - Previous);
         if (Dist < r) && (i ~= idx(end)) 
             Angle = clangle(LastLine, X(i,:)- Previous);
-            %if ((Angle > MinAngle) && (norm(X(i,:) - Previous) <= norm(X(i,:) - PrePrevious))) ...
             if (Angle > MinAngle) && (norm(X(i,:) - Previous) <= norm(X(i,:) - PrePrevious)) ...
-                    && ((BestAngle > Angle) || (BestAngle == Angle) && (Dist > BestDist))
+                    && (BestAngle > Angle)
                 BestIdx = i;
                 BestAngle = Angle;
-                BestDist = Dist;
             end
             if (Angle > MinAngle) && (norm(X(i,:) - Previous) > norm(X(i,:) - PrePrevious)) ...
                     && (TestAngle > Angle)
