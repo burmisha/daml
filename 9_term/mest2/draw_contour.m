@@ -12,13 +12,14 @@
 % bird 4 -> 20
 % fish 38 -> 15
 clear all 
-%X = dlmread('data/fish (38).txt', ' ', 1, 0);
-X = dlmread('data/bird (4).txt', ' ', 1, 0);
-r = 10
+X = dlmread('data/fish (45).txt', ' ', 1, 0);
+%X = dlmread('data/bird (4).txt', ' ', 1, 0);
+r = 200
 X=X(:,[1 3]);
-
+hold off
     X(:,1) = (X(:,1) - min( X(:,1))) / (max(X(:,1)) - min( X(:,1))) * 100;
     X(:,2) = (X(:,2) - min( X(:,2))) / (max(X(:,2)) - min( X(:,2))) * 100;
+
 %%
 
 %r = 19;
@@ -37,13 +38,19 @@ plot(X(idx,1), X(idx,2), 'b.','LineWidth',3);
 
 Previous = X(idx,:);
 nearest = find(((X(:,1) - Previous(1)).^2 + (X(:,2) - Previous(2)).^2) < r^2);
-nearest(nearest == idx) = [];
+ni = find(nearest == idx);
+nearest(ni) = [];
 XX = X(nearest,:);
-NPrev = (XX(:,1) - Previous(1)).^2 + (XX(:,2) - Previous(2)).^2;
 Angle = clangle([ones(length(nearest),1) * [0 -1] (XX - ones(length(nearest),1) * Previous)]);
-[~, NewIdx] = min(Angle(Angle > MinAngle));
-idx = [idx nearest(NewIdx)];
-plot(X(idx(end),1), X(idx(end),2), 'b.','LineWidth',3);
+Candidates = find(Angle > MinAngle);
+[~, NewIdx] = min(Angle(Candidates));
+idx = [idx nearest(Candidates(NewIdx))];
+
+
+plot(X(nearest,1), X(nearest,2), 'y.','LineWidth',3);
+plot(XX(idx(end),1), XX(idx(end),2), 'g.','LineWidth',4);
+plot(X(nearest,1), X(nearest,2), 'r.','LineWidth',3);
+plot(X(idx,1), X(idx,2), 'b.','LineWidth',3);
 
 while idx(end) ~= idx(1)
     Previous = X(idx(end),:);

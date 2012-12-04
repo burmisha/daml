@@ -13,11 +13,13 @@ nearest = find(((X(:,1) - Previous(1)).^2 + (X(:,2) - Previous(2)).^2) < r^2);
 nearest(nearest == idx) = [];
 XX = X(nearest,:);
 Angle = clangle([ones(length(nearest),1) * [0 -1] (XX - ones(length(nearest),1) * Previous)]);
-[~, NewIdx] = min(Angle(Angle > MinAngle));
-idx = [idx nearest(NewIdx)];
+Candidates = find(Angle > MinAngle);
+[~, NewIdx] = min(Angle(Candidates));
+idx = [idx nearest(Candidates(NewIdx))];
+
 %plot(X(:,1), X(:,2), 'r.','LineWidth',2);
 %plot(X(idx,1), X(idx,2), 'b.','LineWidth',2);
-%hold on
+hold on
 while idx(end) ~= idx(1)
     Previous = X(idx(end),:);
     PrePrevious = X(idx(end-1),:);
