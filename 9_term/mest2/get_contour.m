@@ -2,7 +2,7 @@ function [ idx, Perimeter, Area ] = get_contour( X, r )
 %GET_CONTOUR [idx, Perimeter, Area]
 %   form contour of cloud
 MinAngle = -179;
-clangle = @(x) (1.25-4*(heaviside(x(:,1).*x(:,4)-x(:,2).*x(:,3))-0.75).^2) .*abs(acos((x(:,1).*x(:,3)+x(:,2).*x(:,4))./sqrt((x(:,1).^2+ x(:,2).^2) .*(x(:,3).^2+ x(:,4).^2))))*180/pi;
+clangle = @(x) ((x(:,1).*x(:,4)-x(:,2).*x(:,3) >= 0 ) * 2 -1 ) .*abs(acos((x(:,1).*x(:,3)+x(:,2).*x(:,4))./sqrt((x(:,1).^2+ x(:,2).^2) .*(x(:,3).^2+ x(:,4).^2))))*180/pi;
 
 MaxedX=find(X(:,1)==max(X(:,1)));
 [~, idx] = max(X(MaxedX, 2));

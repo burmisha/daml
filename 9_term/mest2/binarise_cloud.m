@@ -1,7 +1,7 @@
 function [ Y ] = binarise_cloud( X, R )
 %BINARISE_CLOUD Summary of this function goes here
 %   Detailed explanation goes here
-    Size = 100;
+    Size = 400;
     Y = zeros(Size+2*R, Size+2*R);
     [XX, Side] = norm_to_square(X);
     XX = round(XX*(Size-1)/Side) + 1;

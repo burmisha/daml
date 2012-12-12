@@ -11,16 +11,15 @@ function [AllFeatures, Per, Area,Id,ConvPer,ConvArea,ConvId ] = collect( fileidx
     ConvId=zeros(length(fileidx), 1);
     i = 0;
     for number=fileidx
-        i = i +1
+        i = i + 1
         X = read_cloud(filename_prefix, number);
         [Y, Side] = norm_to_square(X);
         [idx, Per(i), Area(i)]  = get_contour(Y, R);
         Id(i) = length(idx);
         [idxConv, ConvPer(i), ConvArea(i)]  = get_contour(Y, 2*Side);
         ConvId(i) = length(idxConv);
-        % plot_contour(X, idx);
-        % imshow(binarise_cloud(X, R_bin)');
-        number
+        plot_contour(X, idx);
+        %imshow(binarise_cloud(X, R_bin)');
     end
     AllFeatures = [Per, Area,Id,ConvPer,ConvArea, ConvId];
 end

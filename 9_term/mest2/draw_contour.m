@@ -12,9 +12,9 @@
 % bird 4 -> 20
 % fish 38 -> 15
 clear all 
-X = dlmread('data/fish (45).txt', ' ', 1, 0);
-%X = dlmread('data/bird (4).txt', ' ', 1, 0);
-r = 200
+%X = dlmread('data/fish (45).txt', ' ', 1, 0);
+X = dlmread('data/bird (43).txt', ' ', 1, 0);
+r = 15
 X=X(:,[1 3]);
 hold off
     X(:,1) = (X(:,1) - min( X(:,1))) / (max(X(:,1)) - min( X(:,1))) * 100;
@@ -48,7 +48,7 @@ idx = [idx nearest(Candidates(NewIdx))];
 
 
 plot(X(nearest,1), X(nearest,2), 'y.','LineWidth',3);
-plot(XX(idx(end),1), XX(idx(end),2), 'g.','LineWidth',4);
+plot(X(idx(end),1), X(idx(end),2), 'g.','LineWidth',4);
 plot(X(nearest,1), X(nearest,2), 'r.','LineWidth',3);
 plot(X(idx,1), X(idx,2), 'b.','LineWidth',3);
 
@@ -93,8 +93,8 @@ end
 
 plot(X(idx,1), X(idx,2), 'g-','LineWidth',2);
 
-%iii= get_contour(X, r);
-idx
+iii= get_contour(X, r);
+sum(abs(idx - iii))
 %iii
 
 hold off
