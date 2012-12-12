@@ -3,12 +3,14 @@ function [AllFeatures, Per, Area,Id,ConvPer,ConvArea,ConvId ] = collect( fileidx
 %   Detailed explanation goes here
     R = 10; % 15 - good, 10 - too
     R_bin = 4;
-    Per=zeros(length(fileidx), 1);
-    Area=zeros(length(fileidx), 1);
-    Id=zeros(length(fileidx), 1);
-    ConvPer=zeros(length(fileidx), 1);
-    ConvArea=zeros(length(fileidx), 1);
-    ConvId=zeros(length(fileidx), 1);
+    Zeros = zeros(length(fileidx), 1);
+    Per=Zeros;
+    Area=Zeros;
+    Id=Zeros;
+    ConvPer=Zeros;
+    ConvArea=Zeros;
+    ConvId=Zeros;
+    BranchPoints=Zeros;
     i = 0;
     for number=fileidx
         i = i + 1
@@ -19,8 +21,15 @@ function [AllFeatures, Per, Area,Id,ConvPer,ConvArea,ConvId ] = collect( fileidx
         [idxConv, ConvPer(i), ConvArea(i)]  = get_contour(Y, 2*Side);
         ConvId(i) = length(idxConv);
         plot_contour(X, idx);
+
+        BB = bwmorph(imfill(binarise_contour(X(idx,:)),'holes'),'skel',Inf);
+        for k = 1:40
+            BB = BB - bwmorph(BB, 'endpoints');
+        end
+        BranchPoints(i) = sum(sum(bwmorph(BB, 'branchpoints')));
+
         %imshow(binarise_cloud(X, R_bin)');
     end
-    AllFeatures = [Per, Area,Id,ConvPer,ConvArea, ConvId];
+    AllFeatures = [Per, Area,Id,ConvPer,ConvArea, ConvId,BranchPoints];
 end
 

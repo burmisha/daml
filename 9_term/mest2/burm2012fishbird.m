@@ -30,10 +30,9 @@ for i=1:(length(fish_fileidx_all) + length(bird_fileidx_all))
 end
 ErrorRate = sum(abs(GotAnswers - Answers))/length(GotAnswers)
 
-find(Matrix(:,2)/100/100 > 0.5)
 %%
-ErrorIdx = find(GotAnswers ~= Answers)
-%ErrorFishIdx = ErrorIdx(ErrorIdx <= 55)'
-ErrorBirdIdx = ErrorIdx(ErrorIdx >= 56) - 55'
+ErrorIdx = find(GotAnswers ~= Answers);
+ErrorFishIdx = ErrorIdx(ErrorIdx <= 55)'
+ErrorBirdIdx = (ErrorIdx(ErrorIdx >= 56) - 55)'
 
-Matrix = [collect([], 'fish'); collect(ErrorBirdIdx(6), 'bird')];
+% Matrix = [collect([], 'fish'); collect(ErrorBirdIdx(6), 'bird')];
