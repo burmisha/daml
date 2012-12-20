@@ -15,7 +15,7 @@ X = [
 
 X = [5*X ;randn(200,2)]
 
-C = 0.1;
+C = 1.4;
 
 N = size(X,1);
 prod = @(u,v) (u*v');
@@ -45,12 +45,10 @@ fmin
 % sum(abs(alpha)) - 1
 a = X'*alpha;
 
-eps = 10^-10;
+eps = 10^-5;
 inSphereIdx = find(abs(alpha) < eps);
 onSphereIdx = find((alpha > eps) & (alpha < C - eps));
-selectedOnSphere = X(onSphereIdx(1),:);
-% sum((X(onSphereIdx,:) - repmat(a', length(onSphereIdx),1)).^2,2)
-R = norm(a - selectedOnSphere',2) + eps
+
 
 hold off
 plot(X(:,1),X(:,2), 'r.', 'LineWidth',3)
@@ -58,8 +56,10 @@ hold on
 plot(X(onSphereIdx,1),X(onSphereIdx,2), 'g.','LineWidth',3)
 plot(X(inSphereIdx,1),X(inSphereIdx,2), 'm.','LineWidth',3)
 axis equal
-
 plot(a(1), a(2), 'b.')
+selectedOnSphere = X(onSphereIdx(1),:);
+% sum((X(onSphereIdx,:) - repmat(a', length(onSphereIdx),1)).^2,2)
+R = norm(a - selectedOnSphere',2) + eps
 rectangle('Position',[a(1) - R,a(2)-R,2*R,2*R],'Curvature',[1,1],...
     'EdgeColor','g')
 
