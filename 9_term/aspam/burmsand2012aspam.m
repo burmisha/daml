@@ -10,9 +10,9 @@ model = svdd(X, C);
 hold off
 plot(X(:,1),X(:,2), 'r.', 'LineWidth',3); axis equal; hold on
 
-plot(model.on(:,1), model.on(:,2),  '.','Color',[0 1 0],'LineWidth',3)
-plot(model.out(:,1),model.out(:,2), '.','Color',[0.1 0 0.9],'LineWidth',3)
-plot(model.in(:,1), model.in(:,2),  '.','Color',[0.9 0 0.1],'LineWidth',3)
+plot(model.on(:,1), model.on(:,2),  '.','Color',[0 1 0],'LineWidth',4)
+plot(model.out(:,1),model.out(:,2), '.','Color',[0.1 0 0.9],'LineWidth',2)
+plot(model.in(:,1), model.in(:,2),  '.','Color',[0.9 0 0.1],'LineWidth',2)
 
 a = model.center;
 R = model.radius;

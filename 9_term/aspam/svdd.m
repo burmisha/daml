@@ -27,30 +27,47 @@ function [ model ] = svdd(Data, C)
     upperBound = C*ones(Number,1);  % \alpha_i <= C 
     opts = optimset('Algorithm','active-set','Display','off');
     H = 2 * PairWiseProd;     % cause it minimises 1/2*x'*H*x
-    alpha = quadprog(-H,-SingleWiseProd,[],[],CoeffEq,ValEq,lowerBound,upperBound,[],opts);
+    [alpha, fmin] = quadprog(-H,-SingleWiseProd,[],[],CoeffEq,ValEq,lowerBound,upperBound,[],opts);
     % look http://www.mathworks.com/help/optim/ug/quadprog.html for full decription
     
-    eps = 10^-9;
-    
-    if abs(sum(abs(alpha)) - 1) >= eps
-        display('ERROR: while maximizing quadratic form')
-        alpha
-        abs(sum(abs(alpha)) - 1)
-    end
-    
-    model.alpha = alpha;
-    
-    % form point ON, IN and OUT of sphere
-    model.in_idx = find(abs(alpha) < eps);
-    model.on_idx = find((alpha > eps) & (alpha < C - eps));
-    model.out_idx = find(alpha > C - eps);
-    
-    model.in = Data(model.in_idx,:);
-    model.on = Data(model.on_idx,:);
-    model.out = Data(model.out_idx,:);
-    
-    % form sphere parameters
-    model.center = Data'*alpha + eps;
-    model.radius = mean(sqrt(sum((model.on - repmat(model.center', size(model.on, 1),1)).^2,2)));
+%     center = mean(Data);
+%     F_center = C*sum(sum((Data - repmat(center, size(Data,1), 1)).^2));
+%     
+%     if fmin < F_center
+        eps = 10^-9;
+
+        if abs(sum(abs(alpha)) - 1) >= eps
+            display('ERROR: while maximizing quadratic form')
+            alpha
+            abs(sum(abs(alpha)) - 1)
+        end
+
+        % model.alpha = alpha;
+
+        % form point ON, IN and OUT of sphere
+        model.in_idx = find(abs(alpha) < eps);
+        model.on_idx = find((alpha > eps) & (alpha < C - eps));
+        model.out_idx = find(alpha > C - eps);
+
+        model.in = Data(model.in_idx,:);
+        model.on = Data(model.on_idx,:);
+        model.out = Data(model.out_idx,:);
+
+        % form sphere parameters
+        model.center = Data'*alpha + eps;
+        model.radius = mean(sqrt(sum((model.on - repmat(model.center', size(model.on, 1),1)).^2,2)));
+%     else
+%         model.in_idx = 1:Number;
+%         model.on_idx = [];
+%         model.out_idx = [];
+% 
+%         model.in = Data(model.in_idx,:);
+%         model.on = Data(model.on_idx,:);
+%         model.out = Data(model.out_idx,:);
+% 
+%         % form sphere parameters
+%         model.center = center;
+%         model.radius = max(sqrt(sum((model.in - repmat(model.center', size(model.in, 1),1)).^2,2)));
+%     end
 end
 
