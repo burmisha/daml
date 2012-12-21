@@ -42,11 +42,11 @@ function [ model ] = svdd(Data, C)
             abs(sum(abs(alpha)) - 1)
         end
 
-        % model.alpha = alpha;
+        model.alpha = alpha;
 
         % form point ON, IN and OUT of sphere
         model.in_idx = find(abs(alpha) < eps);
-        model.on_idx = find((alpha > eps) & (alpha < C - eps));
+        model.on_idx = find((alpha >= eps) & (alpha <= C - eps));
         model.out_idx = find(alpha > C - eps);
 
         model.in = Data(model.in_idx,:);
