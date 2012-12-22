@@ -27,47 +27,40 @@ function [ model ] = svdd(Data, C)
     upperBound = C*ones(Number,1);  % \alpha_i <= C 
     opts = optimset('Algorithm','active-set','Display','off');
     H = 2 * PairWiseProd;     % cause it minimises 1/2*x'*H*x
-    [alpha, fmin] = quadprog(-H,-SingleWiseProd,[],[],CoeffEq,ValEq,lowerBound,upperBound,[],opts);
-    % look http://www.mathworks.com/help/optim/ug/quadprog.html for full decription
+    % see http://www.mathworks.com/help/optim/ug/quadprog.html for full decription
+    [alpha, L] = quadprog(-H,-SingleWiseProd,[],[],CoeffEq,ValEq,lowerBound,upperBound,[],opts);
+    [alpha_Zero, L_Zero] = quadprog(-H,-SingleWiseProd,[],[],[],[],lowerBound,upperBound,[],opts);
     
-%     center = mean(Data);
-%     F_center = C*sum(sum((Data - repmat(center, size(Data,1), 1)).^2));
-%     
-%     if fmin < F_center
-        eps = 10^-9;
+    epsilon = 10^-14;
+    
+    center = Data'*alpha;
+    center_Zero = Data'*alpha_Zero/sum(alpha_Zero);
+    OnIdx = find((alpha >= epsilon) & (alpha <= C - epsilon));
+    OnIdx_Zero = find((alpha_Zero >= epsilon) & (alpha_Zero <= C - epsilon));
+    radius = mean(sqrt(sum((Data(OnIdx,:) - repmat(center', size(Data(OnIdx,:), 1),1)).^2,2)));
+    radius_Zero = mean(sqrt(sum((Data(OnIdx_Zero,:) - repmat(center_Zero', size(Data(OnIdx_Zero,:), 1),1)).^2,2)));
 
-        if abs(sum(abs(alpha)) - 1) >= eps
-            display('ERROR: while maximizing quadratic form')
-            alpha
-            abs(sum(abs(alpha)) - 1)
-        end
+    if (radius_Zero < epsilon) && ((L_Zero > L) || (abs(sum(abs(alpha)) - 1) > epsilon)) ...
+        || (Number * C < 1)
+            alpha = alpha_Zero;
+            center = center_Zero;
+            radius = radius_Zero;
+    end
+    
+    model.alpha = alpha;
 
-        model.alpha = alpha;
+    % form point ON, IN and OUT of sphere
+    model.in_idx = find(abs(alpha) < epsilon);
+    model.on_idx = find((alpha >= epsilon) & (alpha <= C - epsilon));
+    model.out_idx = find(alpha > C - epsilon);
 
-        % form point ON, IN and OUT of sphere
-        model.in_idx = find(abs(alpha) < eps);
-        model.on_idx = find((alpha >= eps) & (alpha <= C - eps));
-        model.out_idx = find(alpha > C - eps);
+    model.in = Data(model.in_idx,:);
+    model.on = Data(model.on_idx,:);
+    model.out = Data(model.out_idx,:);
 
-        model.in = Data(model.in_idx,:);
-        model.on = Data(model.on_idx,:);
-        model.out = Data(model.out_idx,:);
+    % form sphere parameters
+    model.center = center;
+    model.radius = radius;
 
-        % form sphere parameters
-        model.center = Data'*alpha + eps;
-        model.radius = mean(sqrt(sum((model.on - repmat(model.center', size(model.on, 1),1)).^2,2)));
-%     else
-%         model.in_idx = 1:Number;
-%         model.on_idx = [];
-%         model.out_idx = [];
-% 
-%         model.in = Data(model.in_idx,:);
-%         model.on = Data(model.on_idx,:);
-%         model.out = Data(model.out_idx,:);
-% 
-%         % form sphere parameters
-%         model.center = center;
-%         model.radius = max(sqrt(sum((model.in - repmat(model.center', size(model.in, 1),1)).^2,2)));
-%     end
 end
 
