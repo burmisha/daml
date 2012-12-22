@@ -1,15 +1,15 @@
-% clear all
+clear all
 % X = [(randn(10,2)+ones(10,2)*(-10)); randn(200,2)];
 
-N = 3;
+N = 100;
 dim = 2;
 R = 5;
 c = 0.05;
 a=[1;2];
 
-C = 0.2;
+C = 0.02;
 
-% X = get_data(N, dim, a, R, c);
+X = get_data(N, dim, a, R, c);
 
 model = svdd(X, C);
 model.alpha
