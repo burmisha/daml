@@ -28,23 +28,27 @@ function [ model ] = svdd(Data, C)
     opts = optimset('Algorithm','active-set','Display','off');
     H = 2 * PairWiseProd;     % cause it minimises 1/2*x'*H*x
     % see http://www.mathworks.com/help/optim/ug/quadprog.html for full decription
-    [alpha, L] = quadprog(-H,-SingleWiseProd,[],[],CoeffEq,ValEq,lowerBound,upperBound,[],opts);
+    [alpha_NotZ, L_NotZ] = quadprog(-H,-SingleWiseProd,[],[],CoeffEq,ValEq,lowerBound,upperBound,[],opts);
     [alpha_Zero, L_Zero] = quadprog(-H,-SingleWiseProd,[],[],[],[],lowerBound,upperBound,[],opts);
     
     epsilon = 10^-14;
     
-    center = Data'*alpha;
+    center_NotZ = Data'*alpha_NotZ;
     center_Zero = Data'*alpha_Zero/sum(alpha_Zero);
-    OnIdx = find((alpha >= epsilon) & (alpha <= C - epsilon));
+    OnIdx_NotZ = find((alpha_NotZ >= epsilon) & (alpha_NotZ <= C - epsilon));
     OnIdx_Zero = find((alpha_Zero >= epsilon) & (alpha_Zero <= C - epsilon));
-    radius = mean(sqrt(sum((Data(OnIdx,:) - repmat(center', size(Data(OnIdx,:), 1),1)).^2,2)));
+    radius_NotZ = mean(sqrt(sum((Data(OnIdx_NotZ,:) - repmat(center_NotZ', size(Data(OnIdx_NotZ,:), 1),1)).^2,2)));
     radius_Zero = mean(sqrt(sum((Data(OnIdx_Zero,:) - repmat(center_Zero', size(Data(OnIdx_Zero,:), 1),1)).^2,2)));
 
-    if (radius_Zero < epsilon) && ((L_Zero > L) || (abs(sum(abs(alpha)) - 1) > epsilon)) ...
+    if (radius_Zero < epsilon) && ((L_Zero > L) || (abs(sum(abs(alpha_NotZ)) - 1) > epsilon)) ...
         || (Number * C < 1)
             alpha = alpha_Zero;
             center = center_Zero;
             radius = radius_Zero;
+    else
+            alpha = alpha_NotZ;
+            center = center_NotZ;
+            radius = radius_NotZ;
     end
     
     model.alpha = alpha;
