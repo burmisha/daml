@@ -5,14 +5,14 @@ N = 100;
 dim = 2;
 R = 5;
 c = 0.05;
-a=[1;2];
+a = [1;2];
 
-C = 0.02;
+C = 0.005;
 
 X = get_data(N, dim, a, R, c);
 
 model = svdd(X, C);
-model.alpha
+
 hold off
 Plot = plot(X(:,1),X(:,2), 'r.', 'LineWidth',3); axis equal; hold on
 
@@ -26,7 +26,7 @@ a_predicted = model.center
 R_predicted = model.radius+10^-9
 plot(a_predicted(1), a_predicted(2), '.', 'Color',[220 150 90]/255, 'LineWidth',3)
 rectangle('Position',[a_predicted(1)-R_predicted, a_predicted(2)-R_predicted,...
-    2*R_predicted, 2*R_predicted],'Curvature',[1,1],'EdgeColor','g'); hold on
-rectangle('Position',[a(1)-R, a(2)-R, 2*R, 2*R],'Curvature',[1,1],'EdgeColor','r')
+    2*R_predicted, 2*R_predicted],'Curvature',[1,1],'EdgeColor','r'); hold on
+rectangle('Position',[a(1)-R, a(2)-R, 2*R, 2*R],'Curvature',[1,1],'EdgeColor','g')
 
 saveas(Plot, strcat('modelData','.eps'), 'eps2c');
