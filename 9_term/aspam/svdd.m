@@ -52,9 +52,9 @@ function [ model ] = svdd(Data, C)
             radius_Out = min(DistSq_NotZ(alpha_NotZ > C - epsilon));
             radius_NotZ = mean(sqrt([radius_In; radius_Out]));
             
-            model.in_idx  = find(DistSq_NotZ < radius_In);
-            model.on_idx  = find((DistSq_NotZ >= radius_In) .* (DistSq_NotZ <= radius_Out));
-            model.out_idx = find(DistSq_NotZ > radius_Out);
+            model.in_idx  = find(DistSq_NotZ < radius_NotZ - epsilon);
+            model.on_idx  = find(abs(DistSq_NotZ - radius_NotZ) <= epsilon);
+            model.out_idx = find(DistSq_NotZ > radius_NotZ + epsilon);
         else
             radius_NotZ = mean(sqrt(sum( (Data(OnIdx_NotZ,:) - ones(length(OnIdx_NotZ),1)*center_NotZ').^2 ,2)));
 

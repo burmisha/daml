@@ -1,9 +1,9 @@
 clear all
 
-N = 10;
+N = 1000;
 dim = 2;
-R = 5;
-c = 0.05;
+R = 3;
+c = 0.2;
 a=[1;2]
 
 Data = get_data(N, dim, a, R, c);
