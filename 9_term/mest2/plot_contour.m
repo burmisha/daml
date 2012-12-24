@@ -3,7 +3,8 @@ function [ h ] = plot_contour( X, idx )
 %   Detailed explanation goes here
     hold off
     %h = plot(X(:,1), X(:,2), 'r.','LineWidth',1); hold on
-    plot(X(idx,1), X(idx,2), 'g-','LineWidth',1); hold on
+    h = plot(X(idx,1), X(idx,2), 'g-','LineWidth',1); hold on
+    plot(X(:,1), X(:,2), 'r.','LineWidth',1);
     plot(X(idx,1), X(idx,2), 'b.','LineWidth',2); hold off
     axis ij;
 end
