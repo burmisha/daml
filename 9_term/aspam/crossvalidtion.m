@@ -1,15 +1,18 @@
 clear all
 
-T = 30;
+T = 1;
 Q = 3;
-C = 0.015:0.0005:0.045;
+C = 0.015:0.005:0.045;
 
-N = 500;
+N = 100;
 dim = 2;
 a = [1;2];
 R = 3;
 c = 0.2;
 
+name = sprintf('CV_N%d_%0.4f-%0.4f-%0.4f_T%d_Q%d',N,C(1),C(2)-C(1),C(end),T,Q);
+
+%%
 X = get_data(N, dim, a, R, c);
 Quality = zeros(size(C,2),1);
 PP = Quality;
@@ -39,7 +42,7 @@ for i=1:length(C)
                 Pre=0;
             end
             Rec = True_Positive/(True_Positive + False_Negative);
-            if isnan(R)
+            if isnan(Rec)
                 Rec = 0;
             end
             
@@ -71,11 +74,10 @@ for i=1:length(C)
     Quality(i) = Qual;
     
 end
-
+dlmwrite(strcat(name,'.matr'), Quality);
 %%
+ReadData = dlmread(strcat(name,'.matr'), ',');
 hold off
-Quality;
-p = plot(C, Quality, 'r-');
-name = sprintf('CV_N%d_%0.4f-%0.4f-%0.4f_T%d_Q%d',N,C(1),C(2)-C(1),C(end),T,Q);
+p = plot(C, ReadData, 'r-', 'LineWidth', 2);
 saveas(p, strcat(name,'.png'), 'png');
 saveas(p, strcat(name,'.eps'), 'eps');
