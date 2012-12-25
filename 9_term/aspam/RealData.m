@@ -1,6 +1,6 @@
 clear all
 
-C = 0.03:0.01:0.2;
+C = 0.03:0.005:0.15;
 
 AllData = dlmread('spambase/spambase.data.txt', ',', 0, 0);
 % 58 --> 1, 0.    | spam, non-spam classes
@@ -19,7 +19,7 @@ HamTest = (Ham - ones(HamSize,1)*min(Spam))./(ones(HamSize,1)*max(Spam)-ones(Ham
 % HamTest = Tmp;
 
 N = 200;
-T = 1;
+T = 20;
 Quality = zeros(size(C,2),T);
 
 name = sprintf('Real_N%d_%0.4f-%0.4f-%0.4f_T%d',N,C(1),C(2)-C(1),C(end),T);
@@ -28,7 +28,8 @@ name = sprintf('Real_N%d_%0.4f-%0.4f-%0.4f_T%d',N,C(1),C(2)-C(1),C(end),T);
 for t=1:T
     Permutation = randperm(SpamSize,N);
     for i=1:length(C)
-        c = C(i)
+        c = C(i);
+        [t, c, i/length(C)]
         model = svdd(SpamTrain(Permutation,:), c);
         True_Positive  = sum(distance(SpamTrain, model.center) <= model.radius);
         True_Negative  = sum(distance(HamTest,   model.center) >  model.radius);
@@ -59,6 +60,6 @@ ToPlot = mean(ReadData,2);
 hold off
 p = plot(C, ToPlot, 'r-', 'LineWidth', 2);
 saveas(p, strcat(name,'.png'), 'png');
-saveas(p, strcat(name,'.eps'), 'eps');
+saveas(p, strcat(name,'.eps'), 'eps2c');
 
 
