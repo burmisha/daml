@@ -1,23 +1,23 @@
 clear all
 
-T = 1;
+T = 20;
 Q = 3;
-C = 0.015:0.005:0.045;
+C = 0.015:0.0005:0.045;
 
-N = 100;
+N = 400;
 dim = 2;
 a = [1;2];
 R = 3;
 c = 0.2;
 
-name = sprintf('CV_N%d_%0.4f-%0.4f-%0.4f_T%d_Q%d',N,C(1),C(2)-C(1),C(end),T,Q);
+name = sprintf('Model_N%d_%0.4f-%0.4f-%0.4f_T%d_Q%d',N,C(1),C(2)-C(1),C(end),T,Q);
+filename = strcat(name,'.mat');
 
+F_one = zeros(length(C),1);
+% PP = F_one;
+% RR = F_one;
 %%
 X = get_data(N, dim, a, R, c);
-Quality = zeros(size(C,2),1);
-PP = Quality;
-RR = Quality;
-
 for i=1:length(C)
     c = C(i);
     Precision = zeros(Q,T);
@@ -26,7 +26,7 @@ for i=1:length(C)
         Pre = randperm(N);
         X_perm = X(Pre,:);
         for q=1:Q
-            (i - 1)/length(C) + (t-1)/T/length(C) + (q-1)/T/Q/length(C)
+            (i - 1)/length(C) + (t-1)/T/length(C) + (q-1)/Q/T/length(C)
             idx_for_train = [1:round((q-1)/Q*N), round(q/Q*N + 1):N];
             idx_for_test = round((q-1)/Q*N+1):round(q/Q*N);
             X_train = X_perm(idx_for_train,:);
@@ -65,19 +65,23 @@ for i=1:length(C)
 %             misses(q,t) = sum(sqrt(sum((X_test - ones(size(X_test,1),1)*model.center').^2,2)) > model.radius) / size(X_test,1);
         end
     end
-    PP(i) = mean(mean(Precision));
-    RR(i) = mean(mean(Recall));
-    Qual = mean(mean(2*Precision.*Recall./(Precision + Recall)));
-    if isnan(Qual)
-        Qual = 0;
+%     PP(i) = mean(mean(Precision));
+%     RR(i) = mean(mean(Recall));
+    Quality = mean(mean(2*Precision.*Recall./(Precision + Recall)));
+    if isnan(Quality)
+        Quality = 0;
     end
-    Quality(i) = Qual;
+    F_one(i) = Quality;
     
 end
-dlmwrite(strcat(name,'.matr'), Quality);
+save(filename, 'F_one');
 %%
-ReadData = dlmread(strcat(name,'.matr'), ',');
+
+load(filename);
 hold off
-p = plot(C, ReadData, 'r-', 'LineWidth', 2);
+p = plot(C, F_one, 'r-', 'LineWidth', 2);
+xlabel('$C$',   'FontSize', 20, 'FontName', 'Times', 'Interpreter','latex');
+ylabel('$F_1$', 'FontSize', 20, 'FontName', 'Times', 'Interpreter','latex');
+axis tight
 saveas(p, strcat(name,'.png'), 'png');
-saveas(p, strcat(name,'.eps'), 'eps');
+saveas(p, strcat(name,'.eps'), 'eps2c');
