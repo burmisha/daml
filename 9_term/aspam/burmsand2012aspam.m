@@ -31,3 +31,17 @@ rectangle('Position',[a_predicted(1)-R_predicted, a_predicted(2)-R_predicted,...
 rectangle('Position',[a(1)-R, a(2)-R, 2*R, 2*R],'Curvature',[1,1],'EdgeColor','g','LineWidth',2)
 
 saveas(Plot, strcat('example','.eps'), 'eps2c');
+
+
+fileID = fopen('Example.txt','w');
+
+fprintf(fileID,strcat('%%','_Example_\n', ...
+        '\\\addplot +[blue, only marks, mark size=1pt]  coordinates {\n'));
+fprintf(fileID,'(%.2f,%.2f)',X');
+fprintf(fileID,'\n};');
+
+fprintf(fileID,'\n\n\n %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% \n\n\n');
+
+fprintf(fileID,'\t(%.3f,\t%.4f)\n',X');
+fprintf(fileID,'};');
+fclose(fileID);

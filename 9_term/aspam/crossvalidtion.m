@@ -82,6 +82,23 @@ hold off
 p = plot(C, F_one, 'r-', 'LineWidth', 2);
 xlabel('$C$',   'FontSize', 20, 'FontName', 'Times', 'Interpreter','latex');
 ylabel('$F_1$', 'FontSize', 20, 'FontName', 'Times', 'Interpreter','latex');
+set(gca, 'FontSize', 20, 'FontName', 'Times')
 axis tight
 saveas(p, strcat(name,'.png'), 'png');
 saveas(p, strcat(name,'.eps'), 'eps2c');
+
+
+fileID = fopen('CVModel.txt','w');
+
+fprintf(fileID,strcat('%%','_CV_',name,'\n', ...
+        '\\addplot[red, mark=none, thick] coordinates {\n'));
+fprintf(fileID,'(%.4f, %.4f)',[C; F_one']);
+fprintf(fileID,'\n};');
+
+fprintf(fileID,'\n\n\n %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% \n\n\n');
+
+fprintf(fileID,strcat('%%','_CV_',name,'\n', ...
+        '\\addplot[red, mark=none, thick] coordinates {\n'));
+fprintf(fileID,'\t(%.4f,\t%.4f)\n',[C; F_one']);
+fprintf(fileID,'};');
+fclose(fileID);

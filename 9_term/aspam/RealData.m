@@ -62,4 +62,19 @@ p = plot(C, ToPlot, 'r-', 'LineWidth', 2);
 saveas(p, strcat(name,'.png'), 'png');
 saveas(p, strcat(name,'.eps'), 'eps2c');
 
+fileID = fopen('CVReal.txt','w');
+
+fprintf(fileID,strcat('%%','_CV_',name,'\n', ...
+        '\\addplot[red, mark=none, thick] coordinates {\n'));
+fprintf(fileID,'(%.4f, %.4f)',[C; ToPlot']);
+fprintf(fileID,'\n};');
+
+fprintf(fileID,'\n\n\n %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% \n\n\n');
+
+fprintf(fileID,strcat('%%','_CV_',name,'\n', ...
+        '\\addplot[red, mark=none, thick] coordinates {\n'));
+fprintf(fileID,'\t(%.4f,\t%.4f)\n',[C; ToPlot']);
+fprintf(fileID,'};');
+
+fclose(fileID);
 
