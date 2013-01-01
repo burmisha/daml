@@ -2,8 +2,14 @@ function [ model ] = svdd(Data, C)
 %SVDD builds Support Vector Data Description model
 %   Mikhail Burmistrov, Liubov Sanduleanu
 %   2012, Moscow, MIPT
+
+    model.Data = Data;
     
-    prod = @(u,v) (u*v');
+    kernel = @(u,v) (u*v'); 
+    model.kernel = kernel;
+    % u - 1 object, row; v - matrix (1 row is 1 object)
+    % kernel returns a row of results
+    
     %prod = @(u,v) (exp(norm(u-v,2)/5));
     
     Number = size(Data, 1);
@@ -14,6 +20,14 @@ function [ model ] = svdd(Data, C)
     radius_Zero = 0;
     DistSq_Zero = sum((Data - ones(Number, 1)*center_Zero').^2,2);
     
+    PairWise = zeros(Number); % count matrix || x_i\cdot x_j ||
+    for i=1:Number
+        for j=1:Number
+            PairWise(i,j) = kernel(Data(i,:), Data(j,:));
+        end
+    end
+    model.PairWise = PairWise;
+    
     if Number * C < 1
         alpha = alpha_Zero;
         center = center_Zero;
@@ -22,17 +36,10 @@ function [ model ] = svdd(Data, C)
         model.in_idx  = find(DistSq_Zero <  radius);
         model.on_idx  = find(DistSq_Zero == radius);
         model.out_idx = find(DistSq_Zero >  radius);        
-    else
-        PairWiseProd = zeros(Number); % count matrix || x_i\cdot x_j ||
+    else   
+        SingleWise = zeros(Number,1); % count vector || x_i\cdot x_i ||
         for i=1:Number
-            for j=1:Number
-                PairWiseProd(i,j) = -prod(Data(i,:), Data(j,:));  
-            end
-        end
-       
-        SingleWiseProd = zeros(Number,1); % count vector || x_i\cdot x_i ||
-        for i=1:Number
-            SingleWiseProd(i) = prod(Data(i,:), Data(i,:));
+            SingleWise(i) = kernel(Data(i,:), Data(i,:));
         end
 
         CoeffEq = ones(1,Number);
@@ -40,9 +47,9 @@ function [ model ] = svdd(Data, C)
         lowerBound = zeros(Number,1);   % \alpha_i >= 0
         upperBound = C*ones(Number,1);  % \alpha_i <= C 
         opts = optimset('Algorithm','active-set','Display','off','TolX',1.e-15);
-        H = 2 * PairWiseProd;     % cause it minimises 1/2*x'*H*x
+        H = -2 * PairWise;     % cause it minimises 1/2*x'*H*x
         % see http://www.mathworks.com/help/optim/ug/quadprog.html for full decription    
-        [alpha_NotZ, L_NotZ] = quadprog(-H,-SingleWiseProd,[],[],CoeffEq,ValEq,lowerBound,upperBound,[],opts);
+        [alpha_NotZ, L_NotZ] = quadprog(-H,-SingleWise,[],[],CoeffEq,ValEq,lowerBound,upperBound,[],opts);
         L_NotZ = -L_NotZ;
         center_NotZ = Data'*alpha_NotZ;
         DistSq_NotZ = sum((Data - ones(Number, 1)*center_NotZ').^2,2);
@@ -90,5 +97,8 @@ function [ model ] = svdd(Data, C)
     % form sphere parameters
     model.center = center;
     model.radius = radius;
+    
+    % object is a row
+    model.classify = @(x) ((model.kernel(x,x) - 2*model.kernel(x, model.Data)*model.alpha + model.alpha'*PairWise*model.alpha) <= model.radius); 
 end
 
