@@ -6,8 +6,8 @@ function [ m ] = svdd(Data, C)
     m.Data = Data;
     m.C = C;
     
-    kernel = @(u,v) (u*v'); 
-    % kernel = @(u,v) (exp(norm(u-v,2)/5));
+    % kernel = @(u,v) (u*v'); 
+    kernel = @(u,v) ( exp( - sum((repmat(u, size(v,1), 1) - v).^2,2)/5)' );
     m.kernel = kernel;
     % u - 1 object, row; v - matrix (1 row is 1 object)
     % kernel returns a row of results
@@ -49,7 +49,7 @@ function [ m ] = svdd(Data, C)
     if isempty(m.on)
         error('ERROR: No points on sphere. Go debugging! Good luck!')
     end
-    
+
     m.count_sq_dist_t = @(x) (m.kernel(x,x) - 2*m.kernel(x, m.Data)*m.alpha + m.alpha'*m.PairWise*m.alpha);
     m.count_sq_dist = @(X) (cellfun(m.count_sq_dist_t, num2cell(X,2)));
     
