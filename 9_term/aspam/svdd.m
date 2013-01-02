@@ -1,4 +1,4 @@
-function [ m ] = svdd(Data, C)
+function [ m ] = svdd(Data, C, varargin)
 %SVDD builds Support Vector Data Description model
 %   Mikhail Burmistrov, Liubov Sanduleanu
 %   2012, Moscow, MIPT
@@ -6,9 +6,26 @@ function [ m ] = svdd(Data, C)
     m.Data = Data;
     m.C = C;
     
-    % kernel = @(u,v) (u*v'); 
-    kernel = @(u,v) ( exp( - sum((repmat(u, size(v,1), 1) - v).^2,2)/5)' );
-    m.kernel = kernel;
+    NVarargs = length(varargin);
+    if NVarargs > 0
+        if strcmp(varargin{1},'rbf')
+            if NVarargs ~= 2
+                error('Error: "rbf" option requires more.')
+            else
+                m.kernel = @(u,v) ( exp( - sum((repmat(u, size(v,1), 1) - v).^2,2)/varargin{2})' );
+            end
+        elseif strcmp(varargin{1},'ell2')
+            if NVarargs ~= 1
+                error('Error: "ell2" option requires nothing else.')
+            else
+                m.kernel = @(u,v) (u*v'); 
+            end
+        else
+            error('Error: no such option.')
+        end
+    else
+        m.kernel = @(u,v) (u*v'); 
+    end
     % u - 1 object, row; v - matrix (1 row is 1 object)
     % kernel returns a row of results
     
@@ -22,13 +39,13 @@ function [ m ] = svdd(Data, C)
     m.PairWise = zeros(Number); % count matrix || x_i\cdot x_j ||
     for i=1:Number
         for j=1:Number
-            m.PairWise(i,j) = kernel(Data(i,:), Data(j,:));
+            m.PairWise(i,j) = m.kernel(Data(i,:), Data(j,:));
         end
     end
 
     m.SelfWise = zeros(Number,1); % count vector || x_i\cdot x_i ||
     for i=1:Number
-        m.SelfWise(i) = kernel(Data(i,:), Data(i,:));
+        m.SelfWise(i) = m.kernel(Data(i,:), Data(i,:));
     end
     
     CoeffEq = ones(1,Number);
@@ -41,7 +58,6 @@ function [ m ] = svdd(Data, C)
     m.in_idx = find(abs(m.alpha) < epsilon);
     m.on_idx = find((m.alpha >= epsilon) & (m.alpha <= m.C - epsilon));
     m.out_idx = find(m.alpha > m.C - epsilon);
-    % form points ON, IN and OUT of sphere
     m.in = m.Data(m.in_idx,:);
     m.on = m.Data(m.on_idx,:);
     m.out = m.Data(m.out_idx,:); 

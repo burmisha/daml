@@ -12,7 +12,7 @@ C = 0.008;
 X = [get_data(N, dim, a, R, c); ...
      get_data(N, dim, a+[5;0], R, c)];
 
-model = svdd(X, C);
+model = svdd(X, C, 'rbf', 8);
 %%
 hold off
 Plot = plot(X(:,1),X(:,2), 'b.', 'MarkerSize',10); axis equal; hold on
@@ -29,8 +29,8 @@ saveas(Plot, strcat('example','.png'), 'png');
 save_everything('Example.txt', '_Example',[2,2], X);
 %%
 
-First = min(X(:,1)):0.03:max(X(:,1));
-Second = min(X(:,2)):0.03:max(X(:,2));
+First = min(X(:,1)):0.12:max(X(:,1));
+Second = min(X(:,2)):0.12:max(X(:,2));
 [X2, X1] = meshgrid(Second, First);
 coords = cell(length(First), length(Second));
 for i=1:length(First)
