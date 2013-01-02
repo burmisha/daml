@@ -5,7 +5,7 @@ N = 240;
 dim = 2;
 R = 3;
 c = 0.2;
-a = [1;2];
+a = [1;6];
 
 C = 0.008;
 
@@ -38,8 +38,8 @@ model.classify([1, 1])
 
 %%
 
-First = -1:.1:3.5;
-Second = -1:.1:3.5;
+First = a(1)-2:.03:a(1)+2;
+Second = a(2)-2:.03:a(2)+2;
 [X1, X2] = meshgrid(First,Second);
 coords = cell(length(First), length(Second));
 for i=1:length(First)
@@ -47,6 +47,7 @@ for i=1:length(First)
         coords{i,j} = [First(i), Second(j)];
     end
 end
-classes = double(cellfun(model.classify, coords));
-[C,h] = contour(X2,X1,classes,1);
+classes = double(cellfun(model.classify, coords')); % TODO: check transpose
+[C,h] = contour(X1,X2,classes,1, 'EdgeColor', 'b');
+set(h,'LineWidth',2)
 axis equal
