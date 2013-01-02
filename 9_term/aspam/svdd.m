@@ -29,8 +29,8 @@ function [ m ] = svdd(Data, C, varargin)
     % u - 1 object, row; v - matrix (1 row is 1 object)
     % kernel returns a row of results
     
-    Number = size(Data, 1);
-    if Number * C < 1
+    Number = size(m.Data, 1);
+    if Number * m.C < 1
         error( 'ERROR: Too small C. Radius is 0.')
     end
     
@@ -62,14 +62,16 @@ function [ m ] = svdd(Data, C, varargin)
     m.on = m.Data(m.on_idx,:);
     m.out = m.Data(m.out_idx,:); 
     
-    if isempty(m.on)
-        error('ERROR: No points on sphere. Go debugging! Good luck!')
-    end
-
     m.count_sq_dist_t = @(x) (m.kernel(x,x) - 2*m.kernel(x, m.Data)*m.alpha + m.alpha'*m.PairWise*m.alpha);
     m.count_sq_dist = @(X) (cellfun(m.count_sq_dist_t, num2cell(X,2)));
     
-    m.radius = mean(sqrt(m.count_sq_dist(m.on)));
+    if ~isempty(m.on)
+        m.radius = mean(sqrt(m.count_sq_dist(m.on)));
+    else
+        display('Error: No points on sphere. Try debugging! Good luck!')
+        m.radius = (max(sqrt(m.count_sq_dist(m.in))) + min(sqrt(m.count_sq_dist(m.out))))/2;
+    end
+    
     m.classify = @(x) (m.count_sq_dist(x) <= m.radius^2); 
 end
 

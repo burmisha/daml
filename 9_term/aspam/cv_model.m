@@ -1,8 +1,8 @@
 clear all
 
-T = 20;
-Q = 3;
-C = 0.015:0.0005:0.045;
+T = 1;
+Q = 2;
+C = 0.07:0.0005:0.1;
 
 N = 400;
 dim = 2;
@@ -16,43 +16,31 @@ filename = strcat(name,'.mat');
 F_one = zeros(length(C),1);
 %%
 X = get_data(N, dim, a, R, c);
-for i=1:length(C)
+for i = 1:length(C)
     c = C(i);
     Precision = zeros(Q,T);
     Recall = zeros(Q,T);
-    for t=1:T
+    for t = 1:T
         Pre = randperm(N);
         X_perm = X(Pre,:);
-        for q=1:Q
+        for q = 1:Q
             (i - 1)/length(C) + (t-1)/T/length(C) + (q-1)/Q/T/length(C)
             idx_for_train = [1:round((q-1)/Q*N), round(q/Q*N + 1):N];
             idx_for_test = round((q-1)/Q*N+1):round(q/Q*N);
             X_train = X_perm(idx_for_train,:);
             X_test = X_perm(idx_for_test,:);
             model = svdd(X_train, c);
-            True_Positive  = sum(distance( X_test(distance(X_test, a) <= R,:), model.center) <= model.radius);
-            True_Negative  = sum(distance( X_test(distance(X_test, a) >  R,:), model.center) >  model.radius);
-            False_Negative = sum(distance( X_test(distance(X_test, a) <= R,:), model.center) >  model.radius);
-            False_Positive = sum(distance( X_test(distance(X_test, a) >  R,:), model.center) <= model.radius);
-            
-            Pre = True_Positive/(True_Positive + False_Positive);
-            if isnan(Pre)
-                Pre=0;
-            end
-            Rec = True_Positive/(True_Positive + False_Negative);
-            if isnan(Rec)
-                Rec = 0;
-            end
-            
-            Precision(q,t) = Pre;
-            Recall(q,t) = Rec;
+            real = (distance(X_test, a) <= R);
+            pred = model.classify(X_test);
+            True_Positive  = sum((real == 1) .* (pred == 1));
+            True_Negative  = sum((real == 0) .* (pred == 0));
+            False_Negative = sum((real == 1) .* (pred == 0)); 
+            False_Positive = sum((real == 0) .* (pred == 1));          
+            Precision(q,t) = zeronan(True_Positive/(True_Positive + False_Positive));
+            Recall(q,t)    = zeronan(True_Positive/(True_Positive + False_Negative));
         end
     end
-    Quality = mean(mean(2*Precision.*Recall./(Precision + Recall)));
-    if isnan(Quality)
-        Quality = 0;
-    end
-    F_one(i) = Quality;  
+    F_one(i) = zeronan(mean(mean(2*Precision.*Recall./(Precision + Recall))));
 end
 save(filename, 'F_one');
 %%

@@ -20,9 +20,10 @@ HamTest = (Ham - ones(HamSize,1)*min(Spam))./(ones(HamSize,1)*max(Spam)-ones(Ham
 
 N = 200;
 T = 20;
-Quality = zeros(size(C,2),T);
+F_one = zeros(size(C,2),T);
 
 name = sprintf('Real_N%d_%0.4f-%0.4f-%0.4f_T%d',N,C(1),C(2)-C(1),C(end),T);
+filename = strcat(name,'.mat');
 
 %%
 for t=1:T
@@ -31,32 +32,20 @@ for t=1:T
         c = C(i);
         [t, c, i/length(C)]
         model = svdd(SpamTrain(Permutation,:), c);
-        True_Positive  = sum(distance(SpamTrain, model.center) <= model.radius);
-        True_Negative  = sum(distance(HamTest,   model.center) >  model.radius);
-        False_Negative = sum(distance(SpamTrain, model.center) >  model.radius);
-        False_Positive = sum(distance(HamTest,   model.center) <= model.radius);
-        
-        Precision = True_Positive/(True_Positive + False_Positive);
-        if isnan(Precision)
-            Precision=0;
-        end
-        Recall = True_Positive/(True_Positive + False_Negative);
-        if isnan(Recall)
-            Recall = 0;
-        end
-        
-        Qual = 2*Precision*Recall/(Precision + Recall);
-        if isnan(Qual)
-            Qual = 0;
-        end
-        Qual
-        Quality(i,t) = Qual;
+        True_Positive  = sum(model.classify(SpamTrain) == 1);
+        True_Negative  = sum(model.classify(HamTest)   == 0);
+        False_Negative = sum(model.classify(SpamTrain) == 0);
+        False_Positive = sum(model.classify(HamTest)   == 1);      
+        Precision = zeronan(True_Positive/(True_Positive + False_Positive));
+        Recall    = zeronan(True_Positive/(True_Positive + False_Negative));
+        F_one(i,t) = zeronan(2*Precision*Recall/(Precision + Recall));
     end
 end
-dlmwrite(strcat(name,'.matr'), Quality);
+
+save(filename, 'F_one');
 %%
-ReadData = dlmread(strcat(name,'.matr'), ',');
-ToPlot = mean(ReadData,2);
+load(filename);
+ToPlot = mean(F_one,2);
 hold off
 p = plot(C, ToPlot, 'r-', 'LineWidth', 2);
 saveas(p, strcat(name,'.png'), 'png');
