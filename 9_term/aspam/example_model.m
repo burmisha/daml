@@ -7,7 +7,7 @@ R = 3;
 c = 0.2;
 a = [1;2];
 
-C = 0.007;
+C = 0.008;
 
 X = get_data(N, dim, a, R, c);
 
@@ -34,4 +34,19 @@ saveas(Plot, strcat('example','.eps'), 'eps2c');
 
 save_everything('Example.txt', '_Example',[2,2], X);
 
-model.classify([0,-5])
+model.classify([1, 1])
+
+%%
+
+First = -1:.1:3.5;
+Second = -1:.1:3.5;
+[X1, X2] = meshgrid(First,Second);
+coords = cell(length(First), length(Second));
+for i=1:length(First)
+    for j=1:length(Second)
+        coords{i,j} = [First(i), Second(j)];
+    end
+end
+classes = double(cellfun(model.classify, coords));
+[C,h] = contour(X2,X1,classes,1);
+axis equal

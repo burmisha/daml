@@ -13,7 +13,7 @@ function [ model ] = svdd(Data, C)
     %prod = @(u,v) (exp(norm(u-v,2)/5));
     
     Number = size(Data, 1);
-    epsilon = 10^-14;
+    epsilon = 10^-16;
     
     alpha_Zero = ones(Number,1)/Number;
     center_Zero = Data'*alpha_Zero;
@@ -99,6 +99,6 @@ function [ model ] = svdd(Data, C)
     model.radius = radius;
     
     % object is a row
-    model.classify = @(x) ((model.kernel(x,x) - 2*model.kernel(x, model.Data)*model.alpha + model.alpha'*PairWise*model.alpha) <= model.radius); 
+    model.classify = @(x) ((model.kernel(x,x) - 2*model.kernel(x, model.Data)*model.alpha + model.alpha'*model.PairWise*model.alpha) <= model.radius); 
 end
 
