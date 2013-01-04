@@ -20,6 +20,12 @@ function [ m ] = svdd(Data, C, varargin)
             else
                 m.kernel = @(u,v) (u*v'); 
             end
+        elseif strcmp(varargin{1},'poly')
+            if NVarargs ~= 2
+                error('Error: "poly"  option requires more: deg.')
+            else
+                m.kernel = @(u,v) ((1+u*v').^varargin{2}); 
+            end        
         else
             error('Error: no such option.')
         end
