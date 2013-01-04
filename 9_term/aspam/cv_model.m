@@ -2,7 +2,7 @@ clear all
 
 T = 20;
 Q = 3;
-C = 0.015:0.0005:0.045;
+C = 0.015:0.005:0.045;
 
 N = 400;
 dim = 2;
@@ -32,10 +32,10 @@ for i = 1:length(C)
             model = svdd(X_train, c);
             real = (distance(X_test, a) <= R);
             pred = model.classify(X_test);
-            True_Positive  = sum((real == 1) .* (pred == 1));
-            True_Negative  = sum((real == 0) .* (pred == 0));
-            False_Negative = sum((real == 1) .* (pred == 0)); 
-            False_Positive = sum((real == 0) .* (pred == 1));          
+            True_Positive  = sum((real == 1) & (pred == 1));
+            True_Negative  = sum((real == 0) & (pred == 0));
+            False_Negative = sum((real == 1) & (pred == 0)); 
+            False_Positive = sum((real == 0) & (pred == 1));          
             Precision(q,t) = zeronan(True_Positive/(True_Positive + False_Positive));
             Recall(q,t)    = zeronan(True_Positive/(True_Positive + False_Negative));
         end

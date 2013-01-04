@@ -39,6 +39,7 @@
 *.eps
 *.jpg
 *.png
+*.pdf
 
 *.matr
 *.mat
