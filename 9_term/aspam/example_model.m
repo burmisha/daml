@@ -12,7 +12,7 @@ C = 0.008;
 X = [get_data(N, dim, a, R, c); ...
      get_data(N, dim, a+[5;0], R, c)];
 
-model = svdd(X, C, 'rbf', 8);
+model = svdd(X, C);
 %%
 hold off
 Plot = plot(X(:,1),X(:,2), 'b.', 'MarkerSize',10); axis equal; hold on
@@ -29,16 +29,22 @@ saveas(Plot, strcat('example','.png'), 'png');
 save_everything('Example.txt', '_Example',[2,2], X);
 %%
 
-First = min(X(:,1)):0.12:max(X(:,1));
-Second = min(X(:,2)):0.12:max(X(:,2));
-[X2, X1] = meshgrid(Second, First);
-coords = cell(length(First), length(Second));
-for i=1:length(First)
-    for j=1:length(Second)
-        coords{i,j} = [First(i), Second(j)];
-    end
-end
-classes = double(cellfun(model.classify, coords)); % TODO: check transpose
-[C,h] = contour(X1,X2,classes,1, 'EdgeColor', 'b');
-set(h,'LineWidth',2)
-axis equal
+plot_func = @(x,y) (model.count_sq_dist([x,y]) - model.radius^2);
+h = ezplot(plot_func, [min(X(:,1)), max(X(:,1)),min(X(:,2)), max(X(:,2))]);
+set(h,'LineWidth',2,'EdgeColor', 'b')
+
+%%
+
+% First = min(X(:,1)):0.02:max(X(:,1));
+% Second = min(X(:,2)):0.02:max(X(:,2));
+% [X2, X1] = meshgrid(Second, First);
+% coords = cell(length(First), length(Second));
+% for i=1:length(First)
+%     for j=1:length(Second)
+%         coords{i,j} = [First(i), Second(j)];
+%     end
+% end
+% classes = double(cellfun(model.classify, coords)); % TODO: check transpose
+% [C,h] = contour(X1,X2,classes,1, 'EdgeColor', 'r');
+% set(h,'LineWidth',2)
+% axis equal

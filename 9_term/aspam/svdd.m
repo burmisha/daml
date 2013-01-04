@@ -34,7 +34,7 @@ function [ m ] = svdd(Data, C, varargin)
         error( 'ERROR: Too small C. Radius is 0.')
     end
     
-    epsilon = 10^-16;
+    epsilon = 10^-4; % TODO: be careful
 
     m.PairWise = zeros(Number); % count matrix || x_i\cdot x_j ||
     for i=1:Number
@@ -52,7 +52,7 @@ function [ m ] = svdd(Data, C, varargin)
     ValEq = 1;
     lowerBound =       zeros(Number,1);   % \alpha_i >= 0
     upperBound = m.C * ones(Number,1);    % \alpha_i <= C
-    opts = optimset('Algorithm','active-set','Display','off','TolX',1.e-15);
+    opts = optimset('Algorithm','interior-point-convex','Display','off','TolX',1.e-15);
     m.alpha = quadprog(2*m.PairWise,-m.SelfWise,[],[],CoeffEq,ValEq,lowerBound,upperBound,[],opts);
     
     m.in_idx = find(abs(m.alpha) < epsilon);
@@ -72,6 +72,6 @@ function [ m ] = svdd(Data, C, varargin)
         m.radius = (max(sqrt(m.count_sq_dist(m.in))) + min(sqrt(m.count_sq_dist(m.out))))/2;
     end
     
-    m.classify = @(x) (m.count_sq_dist(x) <= m.radius^2); 
+    m.classify = @(X) (m.count_sq_dist(X) <= m.radius^2); 
 end
 
