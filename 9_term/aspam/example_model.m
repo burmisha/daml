@@ -24,7 +24,6 @@ plot(model.in(:,1), model.in(:,2),  '.','Color',[0.9 0 0.1],'MarkerSize',10)
 rectangle('Position',[a(1)-R, a(2)-R, 2*R, 2*R],'Curvature',[1,1],'EdgeColor','g','LineWidth',2);
 rectangle('Position',[a(1)-R+5, a(2)-R, 2*R, 2*R],'Curvature',[1,1],'EdgeColor','g','LineWidth',2);
 rectangle('Position',[a(1)-R+3, a(2)-R+4, 2*R, 2*R],'Curvature',[1,1],'EdgeColor','g','LineWidth',2);
-LaTeXifyTicks(20, 60, 100, '$x_1$', '$x_2$'); % Set axis to LaTeX style
 
 %% Plot separating surface
 plot_func = @(x,y) (model.count_sq_dist([x,y]) - model.radius^2);
@@ -33,6 +32,7 @@ set(h,'LineWidth',2,'EdgeColor', 'b')
 
 %% Save everything
 
+LaTeXifyTicks(20, 60, 100, '$x_1$', '$x_2$'); % Set axis to LaTeX style
 % saveas(Plot, strcat('example','.eps'), 'eps2c');
 % saveas(Plot, strcat('example','.png'), 'png');
 saveas(Plot, strcat('example','.pdf'), 'pdf');

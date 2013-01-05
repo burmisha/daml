@@ -51,7 +51,7 @@ load(filename);
 hold off
 p = plot(C, F_one, 'r-', 'LineWidth', 2);
 axis tight
-LaTeXifyTicks(20, 30000, 12000, '$C$', '$F_1$'); % Set axis to LaTeX style
+LaTeXifyTicks(20, 30000, 10000, '$C$', '$F_1$'); % Set axis to LaTeX style
 saveas(p, strcat(name,'.pdf'), 'pdf');
 saveas(p, strcat(name,'.eps'), 'eps2c');
 save_everything('CVReal.txt', strcat('_CV_', name),[3,4], [C', F_one']);
