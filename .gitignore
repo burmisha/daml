@@ -35,6 +35,8 @@
 *.asv
 *.7z
 *.7zip
+*.htm
+*.html
 
 *.eps
 *.jpg

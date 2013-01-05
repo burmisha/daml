@@ -58,7 +58,7 @@ function [ m ] = svdd(Data, C, varargin)
     ValEq = 1;
     lowerBound =       zeros(Number,1);   % \alpha_i >= 0
     upperBound = m.C * ones(Number,1);    % \alpha_i <= C
-    opts = optimset('Algorithm','interior-point-convex','Display','off','TolX',1.e-15);
+    opts = optimset('Algorithm','interior-point-convex','Display','off','TolX',1e-14,'TolFun',1e-14,'UseParallel','always');
     m.alpha = quadprog(2*m.PairWise,-m.SelfWise,[],[],CoeffEq,ValEq,lowerBound,upperBound,[],opts);
     
     m.in_idx = find(abs(m.alpha) < epsilon);
