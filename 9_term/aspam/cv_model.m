@@ -13,18 +13,21 @@ c = 0.2;
 name = sprintf('Model_N%d_%0.4f-%0.4f-%0.4f_T%d_Q%d',N,C(1),C(2)-C(1),C(end),T,Q);
 filename = strcat(name,'.mat');
 
-F_one = zeros(length(C),1);
 %%
+startTime = get_time()
+clear F_one;
+matlabpool local 4
 X = get_data(N, dim, a, R, c);
-for i = 1:length(C)
+parfor i = 1:length(C)
+    X_copy = X;
     c = C(i);
     Precision = zeros(Q,T);
     Recall = zeros(Q,T);
     for t = 1:T
         Pre = randperm(N);
-        X_perm = X(Pre,:);
+        X_perm = X_copy(Pre,:);
         for q = 1:Q
-            (i - 1)/length(C) + (t-1)/T/length(C) + (q-1)/Q/T/length(C)
+            % (i - 1)/length(C) + (t-1)/T/length(C) + (q-1)/Q/T/length(C);
             idx_for_train = [1:round((q-1)/Q*N), round(q/Q*N + 1):N];
             idx_for_test = round((q-1)/Q*N+1):round(q/Q*N);
             X_train = X_perm(idx_for_train,:);
@@ -42,17 +45,17 @@ for i = 1:length(C)
     end
     F_one(i) = zeronan(mean(mean(2*Precision.*Recall./(Precision + Recall))));
 end
+matlabpool close
+finishTime = get_time()
 save(filename, 'F_one');
-%%
 
+%%
 load(filename);
 hold off
 p = plot(C, F_one, 'r-', 'LineWidth', 2);
-xlabel('$C$',   'FontSize', 20, 'FontName', 'Times', 'Interpreter','latex');
-ylabel('$F_1$', 'FontSize', 20, 'FontName', 'Times', 'Interpreter','latex');
-set(gca, 'FontSize', 20, 'FontName', 'Times')
 axis tight
-saveas(p, strcat(name,'.png'), 'png');
-saveas(p, strcat(name,'.eps'), 'eps2c');
+LaTeXifyTicks(20, 8500, 40000, '$C$', '$F_1$'); % Set axis to LaTeX style
 
-save_everything('CVModel.txt', strcat('_CV_', name),[4,4], [C', F_one]);
+saveas(p, strcat(name,'.pdf'), 'pdf');
+saveas(p, strcat(name,'.eps'), 'eps2c');
+save_everything('CVModel.txt', strcat('_CV_', name),[4,4], [C', F_one']);
