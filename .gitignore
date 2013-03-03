@@ -43,6 +43,8 @@
 *.jpg
 *.png
 *.pdf
+*.tiff
+*.tif
 
 *.matr
 *.mat
