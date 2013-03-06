@@ -2,7 +2,7 @@ clear all
 
 T = 20;
 Q = 3;
-C = 0.015:0.005:0.045;
+C = 0.010:0.001:0.045;
 
 N = 400;
 dim = 2;
@@ -17,7 +17,7 @@ filename = strcat(name,'.mat');
 startTime = get_time()
 clear F_one;
 matlabpool local 4
-X = get_data(N, dim, a, R, c);
+X = [get_data(N, dim, a, R, c); get_data(N, dim, a + [3; 4], R, c)];
 parfor i = 1:length(C)
     X_copy = X;
     c = C(i);
@@ -32,7 +32,7 @@ parfor i = 1:length(C)
             idx_for_test = round((q-1)/Q*N+1):round(q/Q*N);
             X_train = X_perm(idx_for_train,:);
             X_test = X_perm(idx_for_test,:);
-            model = svdd(X_train, c);
+            model = svdd(X_train, c, 'rbf', 5);
             real = (distance(X_test, a) <= R);
             pred = model.classify(X_test);
             True_Positive  = sum((real == 1) & (pred == 1));
@@ -54,7 +54,7 @@ load(filename);
 hold off
 p = plot(C, F_one, 'r-', 'LineWidth', 2);
 axis tight
-LaTeXifyTicks(20, 8500, 40000, '$C$', '$F_1$'); % Set axis to LaTeX style
+LaTeXifyTicks(20, 3000, 40000, '$C$', '$F_1$'); % Set axis to LaTeX style
 
 saveas(p, strcat(name,'.pdf'), 'pdf');
 saveas(p, strcat(name,'.eps'), 'eps2c');
