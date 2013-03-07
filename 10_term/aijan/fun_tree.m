@@ -5,11 +5,11 @@ function [list] = fun_tree(A)
 
     NVer = size(A, 1);  % Number of vertecies in graph
 
-    B = zeros(NVer);    % prepare empty Adjacency matrix
-    idx = 1:NVer;       % useful vector ;-)
-    for e = 1:size(A, 2)                % take every edge
-        vertecies = idx(A(:,e)==1);        % find its's vertecies
-        B(vertecies(1), vertecies(2)) = 1;    % put this into 2 cells
+    B = zeros(NVer);        % prepare empty Adjacency matrix
+    idx = 1:NVer;           % useful vector ;-)
+    for e = 1:size(A, 2)    % take every edge
+        vertecies = idx(A(:,e)==1);         % find its's vertecies
+        B(vertecies(1), vertecies(2)) = 1;  % put this into 2 cells
         B(vertecies(2), vertecies(1)) = 1;  
     end
 
@@ -22,8 +22,7 @@ function [list] = fun_tree(A)
         vertex = queue(1);      % take it's first element
         incedent_vertecies_bool = (B(:,vertex) == 1) & (looked == 0);   % find adjacent vertecies in bool format
         list = [list, idx(incedent_vertecies_bool)];                    % add this vertecies to the list
-        queue = [queue, idx(incedent_vertecies_bool)];                  % and to the queue
-        queue = queue(2:end);
+        queue = [queue(2:end), idx(incedent_vertecies_bool)];           % and to the queue
         looked(vertex) = 1;     % this vertex will be forgotten
     end
 end
