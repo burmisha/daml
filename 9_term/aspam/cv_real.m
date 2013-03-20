@@ -1,6 +1,6 @@
 clear all
 
-C = 0.03:0.05:0.15;
+C = 0.1:0.005:0.3;
 
 AllData = dlmread('spambase/spambase.data.txt', ',', 0, 0);
 % 58 --> 1, 0.    | spam (1), non-spam (0) classes
