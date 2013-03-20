@@ -1,6 +1,6 @@
 clear all
 
-C = 0.1:0.005:0.3;
+C = 0.05:0.0025:0.2;
 
 AllData = dlmread('spambase/spambase.data.txt', ',', 0, 0);
 % 58 --> 1, 0.    | spam (1), non-spam (0) classes
@@ -15,7 +15,7 @@ SpamTrain = (Spam - ones(SpamSize,1)*min(Spam))./(ones(SpamSize,1)*max(Spam)-one
 HamTest = (Ham - ones(HamSize,1)*min(Spam))./(ones(HamSize,1)*max(Spam)-ones(HamSize,1)*min(Spam));
 
 N = 200;
-T = 20;
+T = 50;
 rbf = 1;
 name = sprintf('Real_N%d_%0.4f-%0.4f-%0.4f_T%d_rbf%0.3f',N,C(1),C(2)-C(1),C(end),T,rbf);
 filename = strcat(name,'.mat');
