@@ -1,6 +1,6 @@
 clear all
 
-C = 0.03:0.005:0.15;
+C = 0.03:0.05:0.15;
 
 AllData = dlmread('spambase/spambase.data.txt', ',', 0, 0);
 % 58 --> 1, 0.    | spam (1), non-spam (0) classes
@@ -16,8 +16,8 @@ HamTest = (Ham - ones(HamSize,1)*min(Spam))./(ones(HamSize,1)*max(Spam)-ones(Ham
 
 N = 200;
 T = 20;
-
-name = sprintf('Real_N%d_%0.4f-%0.4f-%0.4f_T%d',N,C(1),C(2)-C(1),C(end),T);
+rbf = 1;
+name = sprintf('Real_N%d_%0.4f-%0.4f-%0.4f_T%d_rbf%0.3f',N,C(1),C(2)-C(1),C(end),T,rbf);
 filename = strcat(name,'.mat');
 
 %%
@@ -33,7 +33,7 @@ parfor i=1:length(C)
     for t=1:T
         Permutation = randperm(SpamSize,N);
         % [t, c, i/length(C)]
-        model = svdd(Spam_copy(Permutation,:), c);
+        model = svdd(Spam_copy(Permutation,:), c, 'rbf', rbf);
         True_Positive  = sum(model.classify(SpamTrain) == 1);
         True_Negative  = sum(model.classify(HamTest)   == 0);
         False_Negative = sum(model.classify(SpamTrain) == 0);
