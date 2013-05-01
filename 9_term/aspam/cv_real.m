@@ -1,6 +1,7 @@
 clear all
 
-C = 0.05:0.0025:0.2;
+% C = 0.03:0.01:0.2;
+C = 0.04:0.004:0.12;
 
 AllData = dlmread('spambase/spambase.data.txt', ',', 0, 0);
 % 58 --> 1, 0.    | spam (1), non-spam (0) classes
@@ -14,9 +15,9 @@ HamSize = size(Ham,  1);
 SpamTrain = (Spam - ones(SpamSize,1)*min(Spam))./(ones(SpamSize,1)*max(Spam)-ones(SpamSize,1)*min(Spam));
 HamTest = (Ham - ones(HamSize,1)*min(Spam))./(ones(HamSize,1)*max(Spam)-ones(HamSize,1)*min(Spam));
 
-N = 200;
-T = 50;
-rbf = 1;
+N = 300;
+T = 20;
+rbf = 0.7;
 name = sprintf('Real_N%d_%0.4f-%0.4f-%0.4f_T%d_rbf%0.3f',N,C(1),C(2)-C(1),C(end),T,rbf);
 filename = strcat(name,'.mat');
 
@@ -51,7 +52,7 @@ load(filename);
 hold off
 p = plot(C, F_one, 'r-', 'LineWidth', 2);
 axis tight
-LaTeXifyTicks(20, 30000, 10000, '$C$', '$F_1$'); % Set axis to LaTeX style
+LaTeXifyTicks(20, 110000, 8000, '$C$', '$F_1$'); % Set axis to LaTeX style
 saveas(p, strcat(name,'.pdf'), 'pdf');
 saveas(p, strcat(name,'.eps'), 'eps2c');
 save_everything('CVReal.txt', strcat('_CV_', name),[3,4], [C', F_one']);
