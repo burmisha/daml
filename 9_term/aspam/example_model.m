@@ -7,12 +7,12 @@ R = 1.5;    % Radius of original distribution
 c = 0.6;    % parameter of distribution
 a = [1;6];  % initial center
 
-C = 0.015;    % regularization
+C = 0.012;    % regularization
 
 X = [get_data(N, dim, a, R, c); get_data(N/2, dim, a+[5;0], R, c); get_data(N/3, dim, a+[3;4], R, c)];
 display 'Data formed'
 %% Build model
-model = svdd(X, C, 'poly', 3);
+model = svdd(X, C, 'rbf', 3);
 display 'Model built'
 %% Plot objects on 2D-plane
 hold off
@@ -41,7 +41,7 @@ axis tight
 
 %% Save everything
 
-LaTeXifyTicks(20, 30, 100, '$x_1$', '$x_2$'); % Set axis to LaTeX style
+LaTeXifyTicks(20, 40, 100, '$x_1$', '$x_2$'); % Set axis to LaTeX style
 saveas(Plot, strcat('example','.eps'), 'eps2c');
 saveas(Plot, strcat('example','.png'), 'png');
 % saveas(Plot, strcat('example','.pdf'), 'pdf');
